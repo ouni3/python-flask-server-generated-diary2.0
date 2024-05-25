@@ -1,0 +1,159 @@
+openapi: 3.0.2
+info:
+  title: Diary Management System
+  description: API for managing diary entries
+  version: 1.0.0
+servers:
+- url: http://host.docker.internal:8080/v1
+paths:
+  /diaries:
+    get:
+      summary: Get all diary entries
+      operationId: diaries_get
+      responses:
+        "200":
+          description: Diary entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiaryEntry'
+                x-content-type: application/json
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    post:
+      summary: Create a new diary entry
+      operationId: diaries_post
+      requestBody:
+        description: Diary entry to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiaryEntry'
+      responses:
+        "201":
+          description: Diary entry created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryEntry'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /diaries/{date}:
+    get:
+      summary: Get diary entry by date
+      operationId: diaries_date_get
+      parameters:
+      - name: date
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: date
+      responses:
+        "200":
+          description: Diary entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryEntry'
+        "404":
+          description: Diary entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    patch:
+      summary: Update a diary entry
+      operationId: diaries_date_patch
+      parameters:
+      - name: date
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: date
+      requestBody:
+        description: Diary entry to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiaryEntry'
+      responses:
+        "200":
+          description: Diary entry updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryEntry'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Diary entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    DiaryEntry:
+      required:
+      - content
+      - date
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        content:
+          type: string
+      example:
+        date: 2022-01-01
+        content: This is a diary entry
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      example:
+        error: Internal Server Error
+
